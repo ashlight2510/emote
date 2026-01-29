@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>희노애락 — 감정 썰 플랫폼</title>
+    <meta name="description" content="희노애락, 감정을 털어놓는 익명 썰 플랫폼. 기쁨·분노·사랑·즐거움을 나누고 공감받으세요." />
+    <meta name="keywords" content="희노애락, 감정, 익명, 썰, 커뮤니티, 공감, 일상" />
+    <link rel="canonical" href="https://emote.funnyfunny.cloud/" />
+
+    <meta property="og:title" content="희노애락 — 감정 썰 플랫폼" />
+    <meta property="og:description" content="감정을 털어놓는 익명 썰 플랫폼. 기쁨·분노·사랑·즐거움을 나누고 공감받으세요." />
+    <meta property="og:image" content="https://dummyimage.com/1200x630/fef3c7/92400e&text=Emote" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ctext y='50' font-size='48'%3E%F0%9F%98%8A%3C/text%3E%3C/svg%3E" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              hui: { 50: '#fefce8', 100: '#fef9c3', 400: '#facc15', 500: '#eab308', 600: '#ca8a04' },
+              no: { 50: '#fef2f2', 100: '#fee2e2', 400: '#f87171', 500: '#ef4444', 600: '#dc2626' },
+              ae: { 50: '#fdf2f8', 100: '#fce7f3', 400: '#f472b6', 500: '#ec4899', 600: '#db2777' },
+              rak: { 50: '#ecfdf5', 100: '#d1fae5', 400: '#34d399', 500: '#10b981', 600: '#059669' }
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      :root { color-scheme: light; }
+      body {
+        background: linear-gradient(135deg, #fef3c7 0%, #fce7f3 50%, #d1fae5 100%);
+        min-height: 100vh;
+      }
+      .glass {
+        background: rgba(255,255,255,0.85);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(0,0,0,0.08);
+      }
+      .tap { transition: transform 100ms ease; }
+      .tap:active { transform: scale(0.97); }
+      .emotion-btn { transition: all 150ms ease; }
+      .emotion-btn.active { transform: scale(1.05); box-shadow: 0 8px 25px -5px currentColor; }
+      .card-enter { animation: cardIn 300ms ease-out; }
+      @keyframes cardIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+      .modal-overlay { background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+      .hot-badge { background: linear-gradient(135deg, #f97316, #ef4444); }
+    </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1204894220949193" crossorigin="anonymous"></script>
+  </head>
+  <body class="text-slate-800">
+    <!-- Header -->
+    <header class="sticky top-0 z-40 glass shadow-sm">
+      <div class="max-w-3xl mx-auto px-4 py-3 flex items-center gap-3">
+        <a href="#/" class="tap flex items-center gap-2 font-black text-lg">
+          <span class="text-2xl">😊</span>
+          <span>희노애락</span>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">BETA</span>
+        </a>
+        <div class="ml-auto flex items-center gap-2">
+          <a href="https://funnyfunny.cloud/" target="_blank" rel="noopener" class="tap hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-sm font-semibold hover:bg-slate-200">
+            다른 서비스 ↗
+          </a>
+          <button id="openWriteBtn" class="tap flex items-center gap-1 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-pink-400 text-white font-bold shadow-lg hover:shadow-xl">
+            ✍️ 썰 쓰기
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-4 py-6">
+      <!-- Hero -->
+      <section class="glass rounded-3xl p-6 shadow-lg mb-6">
+        <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-black tracking-tight">
+              오늘, 어떤 <span class="bg-gradient-to-r from-amber-500 via-pink-500 to-emerald-500 bg-clip-text text-transparent">감정</span>이세요?
+            </h1>
+            <p class="mt-1 text-slate-500 text-sm">익명으로 감정을 털어놓고 공감받는 썰 플랫폼</p>
+          </div>
+          <div id="emotionRatio" class="flex gap-1 text-xs font-bold">
+            <span class="px-2 py-1 rounded-full bg-hui-100 text-hui-600">희 --%</span>
+            <span class="px-2 py-1 rounded-full bg-no-100 text-no-600">노 --%</span>
+            <span class="px-2 py-1 rounded-full bg-ae-100 text-ae-600">애 --%</span>
+            <span class="px-2 py-1 rounded-full bg-rak-100 text-rak-600">락 --%</span>
+          </div>
+        </div>
+
+        <!-- 오늘의 감정 질문 -->
+        <div id="dailyQuestion" class="mt-5 p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-pink-50 border border-amber-200">
+          <p class="text-xs font-semibold text-amber-600 mb-1">💡 오늘의 질문</p>
+          <p id="questionText" class="font-bold text-slate-700">로딩 중...</p>
+          <button id="answerQuestionBtn" class="mt-3 tap px-4 py-2 rounded-xl bg-white border border-amber-300 text-amber-700 font-semibold text-sm hover:bg-amber-50">
+            이 질문에 답하기 →
+          </button>
+        </div>
+      </section>
+
+      <!-- 감정 탭 -->
+      <section class="flex flex-wrap gap-2 mb-4">
+        <button data-emotion="all" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-slate-300 text-slate-600 active">
+          🌈 전체
+        </button>
+        <button data-emotion="hui" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-hui-50 border-2 border-hui-300 text-hui-700">
+          😊 희 (기쁨)
+        </button>
+        <button data-emotion="no" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-no-50 border-2 border-no-300 text-no-700">
+          😤 노 (분노)
+        </button>
+        <button data-emotion="ae" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-ae-50 border-2 border-ae-300 text-ae-700">
+          💕 애 (사랑)
+        </button>
+        <button data-emotion="rak" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-rak-50 border-2 border-rak-300 text-rak-700">
+          🎉 락 (즐거움)
+        </button>
+      </section>
+
+      <!-- 정렬 탭 -->
+      <section class="flex gap-2 mb-5">
+        <button data-sort="hot" class="sortBtn tap px-3 py-1.5 rounded-lg font-semibold text-sm bg-orange-100 text-orange-700 border border-orange-200 active">
+          🔥 HOT
+        </button>
+        <button data-sort="new" class="sortBtn tap px-3 py-1.5 rounded-lg font-semibold text-sm bg-slate-100 text-slate-600 border border-slate-200">
+          ✨ NEW
+        </button>
+      </section>
+
+      <!-- 피드 -->
+      <section id="feed" class="space-y-4">
+        <div class="text-center py-12 text-slate-400">로딩 중...</div>
+      </section>
+
+      <!-- 더 보기 -->
+      <div class="mt-6 text-center">
+        <button id="loadMoreBtn" class="tap px-6 py-3 rounded-2xl glass font-bold text-slate-600 hover:bg-white/90 hidden">
+          더 보기 ↓
+        </button>
+      </div>
+
+      <footer class="mt-12 pb-8 text-center text-xs text-slate-400">
+        <p>© FunnyFunny · 희노애락 익명 썰 플랫폼</p>
+        <a href="https://funnyfunny.cloud/" target="_blank" class="inline-block mt-2 px-4 py-2 rounded-xl bg-white/80 border border-slate-200 font-semibold text-slate-500 hover:bg-white">다른 서비스 보기</a>
+      </footer>
+    </main>
+
+    <!-- 글쓰기 모달 -->
+    <div id="writeModal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 modal-overlay"></div>
+      <div class="absolute inset-0 flex items-end sm:items-center justify-center p-4">
+        <div class="glass w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden card-enter">
+          <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-black">✍️ 감정 썰 쓰기</h3>
+              <p class="text-xs text-slate-500">감정을 선택하고 툭 털어놓으세요</p>
+            </div>
+            <button id="closeWriteBtn" class="tap px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200">닫기</button>
+          </div>
+
+          <div class="p-4 space-y-4">
+            <!-- 감정 선택 -->
+            <div>
+              <label class="text-sm font-semibold text-slate-600 mb-2 block">감정 선택</label>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" data-write-emotion="hui" class="writeEmotionBtn tap px-4 py-2 rounded-full font-bold text-sm bg-hui-100 border-2 border-hui-300 text-hui-700 hover:bg-hui-200">😊 희</button>
+                <button type="button" data-write-emotion="no" class="writeEmotionBtn tap px-4 py-2 rounded-full font-bold text-sm bg-no-100 border-2 border-no-300 text-no-700 hover:bg-no-200">😤 노</button>
+                <button type="button" data-write-emotion="ae" class="writeEmotionBtn tap px-4 py-2 rounded-full font-bold text-sm bg-ae-100 border-2 border-ae-300 text-ae-700 hover:bg-ae-200">💕 애</button>
+                <button type="button" data-write-emotion="rak" class="writeEmotionBtn tap px-4 py-2 rounded-full font-bold text-sm bg-rak-100 border-2 border-rak-300 text-rak-700 hover:bg-rak-200">🎉 락</button>
+              </div>
+            </div>
+
+            <!-- 템플릿 힌트 -->
+            <div id="templateHint" class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-600 hidden">
+              <p class="font-semibold mb-1">💡 이렇게 써보세요</p>
+              <p id="templateText"></p>
+            </div>
+
+            <!-- 닉네임 -->
+            <div>
+              <label class="text-sm font-semibold text-slate-600 mb-1 block">닉네임 (선택)</label>
+              <input id="writeNickname" type="text" maxlength="20" placeholder="익명" class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100" />
+            </div>
+
+            <!-- 한 줄 요약 -->
+            <div>
+              <label class="text-sm font-semibold text-slate-600 mb-1 block">한 줄 요약 (선택, 피드에 표시됨)</label>
+              <input id="writeSummary" type="text" maxlength="50" placeholder="ex) 회사 단톡방 대참사 썰" class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100" />
+            </div>
+
+            <!-- 본문 -->
+            <div>
+              <label class="text-sm font-semibold text-slate-600 mb-1 block">본문</label>
+              <textarea id="writeBody" rows="5" maxlength="5000" placeholder="오늘 있었던 일을 툭 털어놓으세요..." class="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 resize-none"></textarea>
+              <div class="mt-1 flex justify-between text-xs text-slate-400">
+                <span>쿨타임: 30초</span>
+                <span id="writeCount">0/5000</span>
+              </div>
+            </div>
+
+            <div class="flex justify-end gap-2">
+              <button id="submitWriteBtn" class="tap px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-pink-400 text-white font-bold shadow-lg hover:shadow-xl">
+                게시하기
+              </button>
+            </div>
+
+            <p id="writeError" class="text-sm text-red-500 hidden"></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 상세 모달 -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden">
+      <div class="absolute inset-0 modal-overlay"></div>
+      <div class="absolute inset-0 flex items-end sm:items-center justify-center p-4 overflow-y-auto">
+        <div id="detailContent" class="glass w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden card-enter my-4">
+          <!-- 동적 렌더링 -->
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ============================
+      // Supabase 연결 (flow와 동일)
+      // ============================
+      const SUPABASE_URL = "https://vpezjsuzwmeozaytcqyv.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZwZXpqc3V6d21lb3pheXRjcXl2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQxMDA0OTIsImV4cCI6MjA3OTY3NjQ5Mn0.Fyjj5yrV2-6w1OKnQXWaL_-7_r1XpuUl-UQq6e6e5vc";
+      const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // ============================
+      // 감정 설정
+      // ============================
+      const EMOTIONS = {
+        hui: { emoji: '😊', label: '희', color: 'hui', desc: '기쁨', slug: 'hui-joy' },
+        no: { emoji: '😤', label: '노', color: 'no', desc: '분노', slug: 'no-anger' },
+        ae: { emoji: '💕', label: '애', color: 'ae', desc: '사랑', slug: 'ae-love' },
+        rak: { emoji: '🎉', label: '락', color: 'rak', desc: '즐거움', slug: 'rak-joy' }
+      };
+
+      const TEMPLATES = {
+        hui: '오늘 제일 기뻤던 순간 → 누가 봐도 공감될 포인트 → 한 줄 결론',
+        no: '상황(팩트) → 내 감정 → 바라는 것(위로 or 해결)',
+        ae: '상대에게 말 못한 한 문장 → 고마웠던 장면 → 지금 느낌',
+        rak: '웃긴 포인트 하나 → 반전 있으면 더 좋아요 → 결말'
+      };
+
+      const DAILY_QUESTIONS = [
+        { emotion: 'hui', q: '오늘 괜히 웃음 나온 순간이 있나요?' },
+        { emotion: 'no', q: '오늘 제일 어이없었던 말 한마디는?' },
+        { emotion: 'ae', q: '지금 떠오르는 한 사람이 있다면?' },
+        { emotion: 'rak', q: '오늘 가장 재밌었던 장면은?' },
+        { emotion: 'hui', q: '작은 거지만 기뻤던 순간을 공유해주세요!' },
+        { emotion: 'no', q: '참다 참다 터진 순간이 있었나요?' },
+        { emotion: 'ae', q: '요즘 마음에 담아둔 사람이 있나요?' },
+        { emotion: 'rak', q: '최근 빵 터진 에피소드를 들려주세요!' }
+      ];
+
+      // ============================
+      // 상태
+      // ============================
+      let currentEmotion = 'all';
+      let currentSort = 'hot';
+      let posts = [];
+      let offset = 0;
+      const LIMIT = 20;
+
+      // ============================
+      // 유틸
+      // ============================
+      const $ = sel => document.querySelector(sel);
+      const $$ = sel => document.querySelectorAll(sel);
+
+      function esc(s) {
+        return String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+      }
+
+      function timeAgo(iso) {
+        const diff = Math.max(0, Date.now() - new Date(iso).getTime());
+        const m = Math.floor(diff / 60000);
+        if (m < 1) return '방금';
+        if (m < 60) return `${m}분 전`;
+        const h = Math.floor(m / 60);
+        if (h < 24) return `${h}시간 전`;
+        return `${Math.floor(h / 24)}일 전`;
+      }
+
+      function getAnonId() {
+        let v = localStorage.getItem('emote_anon');
+        if (!v) {
+          v = crypto?.randomUUID?.() || Date.now() + '-' + Math.random().toString(16).slice(2);
+          localStorage.setItem('emote_anon', v);
+        }
+        return v;
+      }
+
+      function inCooldown() {
+        const until = Number(localStorage.getItem('emote_cd') || '0');
+        return Date.now() < until;
+      }
+
+      function setCooldown(ms) {
+        localStorage.setItem('emote_cd', String(Date.now() + ms));
+      }
+
+      const anonId = getAnonId();
+
+      // 감정 추출 (본문 또는 태그에서)
+      function detectEmotion(post) {
+        const body = (post.body || '').toLowerCase();
+        const boardSlug = post.board?.slug || '';
+        for (const [key, val] of Object.entries(EMOTIONS)) {
+          if (boardSlug.includes(key) || boardSlug.includes(val.slug)) return key;
+        }
+        // 이모지 기반 추측
+        if (/😊|기쁨|좋|행복|감사/.test(body)) return 'hui';
+        if (/😤|화|열받|짜증|분노|억울/.test(body)) return 'no';
+        if (/💕|사랑|설렘|좋아|연인|감동/.test(body)) return 'ae';
+        if (/🎉|재밌|웃|ㅋ|ㅎ|즐거|신남/.test(body)) return 'rak';
+        // 랜덤 폴백
+        const keys = Object.keys(EMOTIONS);
+        return keys[Math.abs(hashCode(post.id || '')) % keys.length];
+      }
+
+      function hashCode(s) {
+        let h = 0;
+        for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+        return h;
+      }
+
+      // HOT 점수 계산 (추천 + 시간 감쇠)
+      function hotScore(post) {
+        const empathy = post.empathy_count || 0;
+        const comments = post.comment_count || 0;
+        const age = (Date.now() - new Date(post.created_at).getTime()) / 3600000; // hours
+        return (empathy * 2 + comments) / Math.pow(age + 2, 1.3);
+      }
+
+      // ============================
+      // 오늘의 질문
+      // ============================
+      function setDailyQuestion() {
+        const dayIdx = new Date().getDate() % DAILY_QUESTIONS.length;
+        const q = DAILY_QUESTIONS[dayIdx];
+        $('#questionText').textContent = q.q;
+        $('#answerQuestionBtn').dataset.emotion = q.emotion;
+      }
+
+      $('#answerQuestionBtn').addEventListener('click', () => {
+        const emotion = $('#answerQuestionBtn').dataset.emotion;
+        openWriteModal(emotion, DAILY_QUESTIONS.find(q => q.emotion === emotion)?.q);
+      });
+
+      // ============================
+      // 감정 비율 로드
+      // ============================
+      async function loadEmotionRatio() {
+        try {
+          const { data } = await sb.from('posts').select('id, body, board:boards(slug)').eq('is_hidden', false).limit(200);
+          if (!data) return;
+          const counts = { hui: 0, no: 0, ae: 0, rak: 0 };
+          data.forEach(p => {
+            const e = detectEmotion(p);
+            if (counts[e] !== undefined) counts[e]++;
+          });
+          const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
+          const ratio = $('#emotionRatio');
+          ratio.innerHTML = `
+            <span class="px-2 py-1 rounded-full bg-hui-100 text-hui-600">희 ${Math.round(counts.hui / total * 100)}%</span>
+            <span class="px-2 py-1 rounded-full bg-no-100 text-no-600">노 ${Math.round(counts.no / total * 100)}%</span>
+            <span class="px-2 py-1 rounded-full bg-ae-100 text-ae-600">애 ${Math.round(counts.ae / total * 100)}%</span>
+            <span class="px-2 py-1 rounded-full bg-rak-100 text-rak-600">락 ${Math.round(counts.rak / total * 100)}%</span>
+          `;
+        } catch (e) { console.error(e); }
+      }
+
+      // ============================
+      // 피드 로드
+      // ============================
+      async function loadFeed(append = false) {
+        if (!append) {
+          offset = 0;
+          $('#feed').innerHTML = '<div class="text-center py-12 text-slate-400">로딩 중...</div>';
+        }
+
+        try {
+          let q = sb.from('posts')
+            .select('id, body, author_name, anon_id, created_at, comment_count, empathy_count, is_hidden, board:boards(id, slug, title)')
+            .eq('is_hidden', false)
+            .range(offset, offset + LIMIT - 1);
+
+          if (currentSort === 'new') {
+            q = q.order('created_at', { ascending: false });
+          } else {
+            q = q.order('empathy_count', { ascending: false });
+          }
+
+          const { data, error } = await q;
+          if (error) throw error;
+
+          let filtered = data || [];
+
+          // 감정 필터
+          if (currentEmotion !== 'all') {
+            filtered = filtered.filter(p => detectEmotion(p) === currentEmotion);
+          }
+
+          // HOT 정렬 시 재정렬
+          if (currentSort === 'hot') {
+            filtered.sort((a, b) => hotScore(b) - hotScore(a));
+          }
+
+          if (append) {
+            posts = [...posts, ...filtered];
+          } else {
+            posts = filtered;
+          }
+
+          renderFeed();
+          offset += LIMIT;
+
+          $('#loadMoreBtn').classList.toggle('hidden', (data?.length || 0) < LIMIT);
+        } catch (e) {
+          console.error(e);
+          $('#feed').innerHTML = '<div class="text-center py-12 text-red-400">로딩 실패</div>';
+        }
+      }
+
+      function renderFeed() {
+        if (posts.length === 0) {
+          $('#feed').innerHTML = `
+            <div class="glass rounded-2xl p-8 text-center">
+              <p class="text-4xl mb-3">📝</p>
+              <p class="font-bold text-slate-600">아직 썰이 없어요</p>
+              <p class="text-sm text-slate-400 mt-1">첫 번째로 감정을 털어놓아 보세요!</p>
+              <button onclick="openWriteModal()" class="tap mt-4 px-5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-pink-400 text-white font-bold">
+                썰 쓰기 →
+              </button>
+            </div>
+          `;
+          return;
+        }
+
+        $('#feed').innerHTML = posts.map((p, i) => {
+          const emotion = detectEmotion(p);
+          const em = EMOTIONS[emotion];
+          const isHot = p.empathy_count >= 3;
+          const summary = extractSummary(p.body);
+          const preview = p.body.slice(0, 120) + (p.body.length > 120 ? '...' : '');
+
+          return `
+            <article class="glass rounded-2xl p-4 card-enter cursor-pointer hover:shadow-lg transition-shadow" data-post-id="${p.id}" style="animation-delay: ${i * 50}ms">
+              <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-full bg-${em.color}-100 flex items-center justify-center text-xl flex-shrink-0">
+                  ${em.emoji}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-center gap-2 flex-wrap">
+                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-${em.color}-100 text-${em.color}-700">${em.emoji} ${em.label}</span>
+                    ${isHot ? '<span class="px-2 py-0.5 rounded-full text-xs font-bold text-white hot-badge">🔥 HOT</span>' : ''}
+                    <span class="text-xs text-slate-400">${esc(p.author_name || '익명')} · ${timeAgo(p.created_at)}</span>
+                  </div>
+                  ${summary ? `<p class="mt-1 font-bold text-slate-800">${esc(summary)}</p>` : ''}
+                  <p class="mt-1 text-sm text-slate-600 line-clamp-2">${esc(preview)}</p>
+                  <div class="mt-2 flex items-center gap-3 text-xs text-slate-500">
+                    <span class="flex items-center gap-1">❤️ ${p.empathy_count || 0}</span>
+                    <span class="flex items-center gap-1">💬 ${p.comment_count || 0}</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          `;
+        }).join('');
+
+        // 클릭 이벤트
+        $$('#feed article[data-post-id]').forEach(el => {
+          el.addEventListener('click', () => openDetail(el.dataset.postId));
+        });
+      }
+
+      function extractSummary(body) {
+        // 첫 줄이 짧으면 요약으로 사용
+        const lines = body.split('\n').filter(l => l.trim());
+        if (lines[0] && lines[0].length <= 50 && lines.length > 1) {
+          return lines[0];
+        }
+        return '';
+      }
+
+      // ============================
+      // 상세 보기
+      // ============================
+      async function openDetail(postId) {
+        const post = posts.find(p => p.id === postId);
+        if (!post) return;
+
+        const emotion = detectEmotion(post);
+        const em = EMOTIONS[emotion];
+
+        // 댓글 로드
+        const { data: comments } = await sb.from('comments')
+          .select('id, body, author_name, created_at')
+          .eq('post_id', postId)
+          .order('created_at', { ascending: true });
+
+        const commentsHtml = (comments || []).map(c => `
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
+            <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
+              <span class="font-semibold text-slate-700">${esc(c.author_name || '익명')}</span>
+              <span>·</span>
+              <span>${timeAgo(c.created_at)}</span>
+            </div>
+            <p class="text-sm text-slate-700">${esc(c.body)}</p>
+          </div>
+        `).join('');
+
+        $('#detailContent').innerHTML = `
+          <div class="p-4 border-b border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-1 rounded-full text-sm font-bold bg-${em.color}-100 text-${em.color}-700">${em.emoji} ${em.label}</span>
+              <span class="text-sm text-slate-500">${esc(post.author_name || '익명')} · ${timeAgo(post.created_at)}</span>
+            </div>
+            <button onclick="closeDetail()" class="tap px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200">닫기</button>
+          </div>
+          <div class="p-4">
+            <p class="text-slate-800 whitespace-pre-wrap leading-relaxed">${esc(post.body)}</p>
+            <div class="mt-4 flex items-center gap-4">
+              <button onclick="empathize('${postId}')" class="tap flex items-center gap-2 px-4 py-2 rounded-xl bg-pink-50 text-pink-600 font-semibold border border-pink-200 hover:bg-pink-100">
+                ❤️ 공감 ${post.empathy_count || 0}
+              </button>
+              <span class="text-sm text-slate-500">💬 댓글 ${post.comment_count || 0}</span>
+            </div>
+          </div>
+          <div class="p-4 border-t border-slate-200">
+            <h4 class="font-bold text-slate-700 mb-3">💬 댓글</h4>
+            <div class="space-y-2 mb-4 max-h-60 overflow-y-auto">
+              ${commentsHtml || '<p class="text-sm text-slate-400">아직 댓글이 없어요</p>'}
+            </div>
+            <div class="flex gap-2">
+              <input id="commentInput" type="text" maxlength="500" placeholder="공감의 한마디..." class="flex-1 px-3 py-2 rounded-xl bg-white border border-slate-200 outline-none focus:border-amber-400" />
+              <button onclick="submitComment('${postId}')" class="tap px-4 py-2 rounded-xl bg-amber-400 text-white font-bold">등록</button>
+            </div>
+          </div>
+        `;
+
+        $('#detailModal').classList.remove('hidden');
+      }
+
+      function closeDetail() {
+        $('#detailModal').classList.add('hidden');
+      }
+
+      $('#detailModal').addEventListener('click', e => {
+        if (e.target === $('#detailModal') || e.target.classList.contains('modal-overlay')) {
+          closeDetail();
+        }
+      });
+
+      // ============================
+      // 공감 / 댓글
+      // ============================
+      async function empathize(postId) {
+        const key = `emote_emp_${postId}`;
+        if (localStorage.getItem(key)) {
+          alert('이미 공감했어요!');
+          return;
+        }
+        try {
+          await sb.rpc('increment_empathy', { row_id: postId });
+          localStorage.setItem(key, '1');
+          alert('공감했어요 ❤️');
+          loadFeed();
+          closeDetail();
+        } catch (e) {
+          console.error(e);
+          alert('공감 실패');
+        }
+      }
+
+      async function submitComment(postId) {
+        const body = $('#commentInput').value.trim();
+        if (!body) return alert('댓글을 입력해주세요');
+        if (inCooldown()) return alert('잠시 후 다시 시도해주세요');
+
+        try {
+          const { error } = await sb.from('comments').insert({
+            post_id: postId,
+            body,
+            author_name: '익명',
+            anon_id: anonId
+          });
+          if (error) throw error;
+          setCooldown(10000);
+          openDetail(postId);
+        } catch (e) {
+          console.error(e);
+          alert('댓글 등록 실패');
+        }
+      }
+
+      // ============================
+      // 글쓰기 모달
+      // ============================
+      let selectedEmotion = '';
+
+      function openWriteModal(emotion = '', prefill = '') {
+        $('#writeModal').classList.remove('hidden');
+        $('#writeBody').value = prefill ? `[오늘의 질문: ${prefill}]\n\n` : '';
+        $('#writeCount').textContent = `${$('#writeBody').value.length}/5000`;
+        if (emotion) selectWriteEmotion(emotion);
+      }
+
+      function closeWriteModal() {
+        $('#writeModal').classList.add('hidden');
+        selectedEmotion = '';
+        $$('.writeEmotionBtn').forEach(b => b.classList.remove('ring-2', 'ring-offset-2'));
+        $('#templateHint').classList.add('hidden');
+      }
+
+      $('#openWriteBtn').addEventListener('click', () => openWriteModal());
+      $('#closeWriteBtn').addEventListener('click', closeWriteModal);
+      $('#writeModal').addEventListener('click', e => {
+        if (e.target === $('#writeModal') || e.target.classList.contains('modal-overlay')) {
+          closeWriteModal();
+        }
+      });
+
+      function selectWriteEmotion(emotion) {
+        selectedEmotion = emotion;
+        $$('.writeEmotionBtn').forEach(b => {
+          const isActive = b.dataset.writeEmotion === emotion;
+          b.classList.toggle('ring-2', isActive);
+          b.classList.toggle('ring-offset-2', isActive);
+        });
+        $('#templateHint').classList.remove('hidden');
+        $('#templateText').textContent = TEMPLATES[emotion];
+      }
+
+      $$('.writeEmotionBtn').forEach(btn => {
+        btn.addEventListener('click', () => selectWriteEmotion(btn.dataset.writeEmotion));
+      });
+
+      $('#writeBody').addEventListener('input', () => {
+        $('#writeCount').textContent = `${$('#writeBody').value.length}/5000`;
+      });
+
+      $('#submitWriteBtn').addEventListener('click', async () => {
+        if (!selectedEmotion) return alert('감정을 선택해주세요');
+        const body = $('#writeBody').value.trim();
+        if (!body || body.length < 10) return alert('10자 이상 써주세요');
+        if (inCooldown()) return alert('잠시 후 다시 시도해주세요');
+
+        const summary = $('#writeSummary').value.trim();
+        const nickname = $('#writeNickname').value.trim() || '익명';
+        const fullBody = summary ? `${summary}\n\n${body}` : body;
+
+        try {
+          // 해당 감정의 board 찾기 또는 생성
+          let { data: board } = await sb.from('boards').select('id').eq('slug', EMOTIONS[selectedEmotion].slug).single();
+
+          if (!board) {
+            const { data: newBoard, error: createErr } = await sb.from('boards').insert({
+              slug: EMOTIONS[selectedEmotion].slug,
+              title: `${EMOTIONS[selectedEmotion].emoji} ${EMOTIONS[selectedEmotion].label} (${EMOTIONS[selectedEmotion].desc})`,
+              description: `${EMOTIONS[selectedEmotion].desc} 감정의 썰을 나누는 공간`,
+              is_active: true
+            }).select().single();
+            if (createErr) throw createErr;
+            board = newBoard;
+          }
+
+          const { error } = await sb.from('posts').insert({
+            board_id: board.id,
+            body: fullBody,
+            author_name: nickname,
+            anon_id: anonId
+          });
+
+          if (error) throw error;
+
+          setCooldown(30000);
+          closeWriteModal();
+          loadFeed();
+          loadEmotionRatio();
+          alert('썰이 등록됐어요! 🎉');
+        } catch (e) {
+          console.error(e);
+          $('#writeError').textContent = '등록 실패: ' + (e.message || '알 수 없는 오류');
+          $('#writeError').classList.remove('hidden');
+        }
+      });
+
+      // ============================
+      // 탭 이벤트
+      // ============================
+      $$('.emotion-btn[data-emotion]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentEmotion = btn.dataset.emotion;
+          $$('.emotion-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          loadFeed();
+        });
+      });
+
+      $$('.sortBtn[data-sort]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          currentSort = btn.dataset.sort;
+          $$('.sortBtn').forEach(b => {
+            b.classList.remove('bg-orange-100', 'text-orange-700', 'border-orange-200');
+            b.classList.add('bg-slate-100', 'text-slate-600', 'border-slate-200');
+          });
+          btn.classList.remove('bg-slate-100', 'text-slate-600', 'border-slate-200');
+          btn.classList.add('bg-orange-100', 'text-orange-700', 'border-orange-200');
+          loadFeed();
+        });
+      });
+
+      $('#loadMoreBtn').addEventListener('click', () => loadFeed(true));
+
+      // ============================
+      // 초기화
+      // ============================
+      setDailyQuestion();
+      loadEmotionRatio();
+      loadFeed();
+    </script>
+  </body>
+</html>
