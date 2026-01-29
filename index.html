@@ -186,12 +186,6 @@
               <input id="writeNickname" type="text" maxlength="20" placeholder="익명" class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100" />
             </div>
 
-            <!-- 한 줄 요약 -->
-            <div>
-              <label class="text-sm font-semibold text-slate-600 mb-1 block">한 줄 요약 (선택, 피드에 표시됨)</label>
-              <input id="writeSummary" type="text" maxlength="50" placeholder="ex) 회사 단톡방 대참사 썰" class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100" />
-            </div>
-
             <!-- 본문 -->
             <div>
               <label class="text-sm font-semibold text-slate-600 mb-1 block">본문</label>
@@ -629,6 +623,12 @@
         }
       });
 
+      document.addEventListener('keydown', (e) => {
+        if (e.key !== 'Escape') return;
+        if (!$('#writeModal').classList.contains('hidden')) closeWriteModal();
+        else if (!$('#detailModal').classList.contains('hidden')) closeDetail();
+      });
+
       function selectWriteEmotion(emotion) {
         selectedEmotion = emotion;
         $$('.writeEmotionBtn').forEach(b => {
@@ -648,15 +648,20 @@
         $('#writeCount').textContent = `${$('#writeBody').value.length}/5000`;
       });
 
+      $('#writeBody').addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+          e.preventDefault();
+          $('#submitWriteBtn').click();
+        }
+      });
+
       $('#submitWriteBtn').addEventListener('click', async () => {
         if (!selectedEmotion) return alert('감정을 선택해주세요');
         const body = $('#writeBody').value.trim();
-        if (!body || body.length < 10) return alert('10자 이상 써주세요');
+        if (!body) return alert('내용을 입력해주세요');
         if (inCooldown()) return alert('잠시 후 다시 시도해주세요');
 
-        const summary = $('#writeSummary').value.trim();
         const nickname = $('#writeNickname').value.trim() || '익명';
-        const fullBody = summary ? `${summary}\n\n${body}` : body;
 
         try {
           // 해당 감정의 board 찾기 또는 생성
@@ -675,7 +680,7 @@
 
           const { error } = await sb.from('posts').insert({
             board_id: board.id,
-            body: fullBody,
+            body,
             author_name: nickname,
             anon_id: anonId
           });
