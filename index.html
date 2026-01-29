@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" id="htmlRoot">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
@@ -51,6 +51,7 @@
       @keyframes cardIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
       .modal-overlay { background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
       .hot-badge { background: linear-gradient(135deg, #f97316, #ef4444); }
+      .lang-switch .langBtn.active { background: white; color: #1e293b; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1204894220949193" crossorigin="anonymous"></script>
   </head>
@@ -64,10 +65,14 @@
           <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 border border-amber-200">BETA</span>
         </a>
         <div class="ml-auto flex items-center gap-2">
-          <a href="https://funnyfunny.cloud/" target="_blank" rel="noopener" class="tap hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-sm font-semibold hover:bg-slate-200">
+          <div class="lang-switch flex gap-1 px-1 py-1 rounded-xl bg-slate-100 border border-slate-200">
+            <button type="button" data-lang="ko" class="langBtn tap px-2.5 py-1 rounded-lg text-xs font-bold text-slate-600 hover:bg-white">한국어</button>
+            <button type="button" data-lang="en" class="langBtn tap px-2.5 py-1 rounded-lg text-xs font-bold text-slate-500 hover:bg-white">English</button>
+          </div>
+          <a href="https://funnyfunny.cloud/" target="_blank" rel="noopener" class="tap hidden sm:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-sm font-semibold hover:bg-slate-200" data-i18n="moreServices">
             다른 서비스 ↗
           </a>
-          <button id="openWriteBtn" class="tap flex items-center gap-1 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-pink-400 text-white font-bold shadow-lg hover:shadow-xl">
+          <button id="openWriteBtn" class="tap flex items-center gap-1 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-pink-400 text-white font-bold shadow-lg hover:shadow-xl" data-i18n="writeBtn">
             ✍️ 썰 쓰기
           </button>
         </div>
@@ -80,9 +85,9 @@
         <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <div>
             <h1 class="text-2xl sm:text-3xl font-black tracking-tight">
-              오늘, 어떤 <span class="bg-gradient-to-r from-amber-500 via-pink-500 to-emerald-500 bg-clip-text text-transparent">감정</span>이세요?
+              <span data-i18n="heroTitle">오늘, 어떤 <span class="bg-gradient-to-r from-amber-500 via-pink-500 to-emerald-500 bg-clip-text text-transparent">감정</span>이세요?</span>
             </h1>
-            <p class="mt-1 text-slate-500 text-sm">익명으로 감정을 털어놓고 공감받는 썰 플랫폼</p>
+            <p class="mt-1 text-slate-500 text-sm" data-i18n="heroSubtitle">익명으로 감정을 털어놓고 공감받는 썰 플랫폼</p>
           </div>
           <div id="emotionRatio" class="flex gap-1 text-xs font-bold">
             <span class="px-2 py-1 rounded-full bg-hui-100 text-hui-600">희 --%</span>
@@ -94,9 +99,9 @@
 
         <!-- 오늘의 감정 질문 -->
         <div id="dailyQuestion" class="mt-5 p-4 rounded-2xl bg-gradient-to-r from-amber-50 to-pink-50 border border-amber-200">
-          <p class="text-xs font-semibold text-amber-600 mb-1">💡 오늘의 질문</p>
-          <p id="questionText" class="font-bold text-slate-700">로딩 중...</p>
-          <button id="answerQuestionBtn" class="mt-3 tap px-4 py-2 rounded-xl bg-white border border-amber-300 text-amber-700 font-semibold text-sm hover:bg-amber-50">
+          <p class="text-xs font-semibold text-amber-600 mb-1" data-i18n="dailyQuestion">💡 오늘의 질문</p>
+          <p id="questionText" class="font-bold text-slate-700">...</p>
+          <button id="answerQuestionBtn" class="mt-3 tap px-4 py-2 rounded-xl bg-white border border-amber-300 text-amber-700 font-semibold text-sm hover:bg-amber-50" data-i18n="answerQuestion">
             이 질문에 답하기 →
           </button>
         </div>
@@ -104,21 +109,11 @@
 
       <!-- 감정 탭 -->
       <section class="flex flex-wrap gap-2 mb-4">
-        <button data-emotion="all" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-slate-300 text-slate-600 active">
-          🌈 전체
-        </button>
-        <button data-emotion="hui" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-hui-50 border-2 border-hui-300 text-hui-700">
-          😊 희 (기쁨)
-        </button>
-        <button data-emotion="no" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-no-50 border-2 border-no-300 text-no-700">
-          😤 노 (분노)
-        </button>
-        <button data-emotion="ae" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-ae-50 border-2 border-ae-300 text-ae-700">
-          💕 애 (사랑)
-        </button>
-        <button data-emotion="rak" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-rak-50 border-2 border-rak-300 text-rak-700">
-          🎉 락 (즐거움)
-        </button>
+        <button data-emotion="all" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-white border-2 border-slate-300 text-slate-600 active" data-i18n="tabAll">🌈 전체</button>
+        <button data-emotion="hui" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-hui-50 border-2 border-hui-300 text-hui-700" data-i18n="tabHui">😊 희 (기쁨)</button>
+        <button data-emotion="no" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-no-50 border-2 border-no-300 text-no-700" data-i18n="tabNo">😤 노 (분노)</button>
+        <button data-emotion="ae" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-ae-50 border-2 border-ae-300 text-ae-700" data-i18n="tabAe">💕 애 (사랑)</button>
+        <button data-emotion="rak" class="emotion-btn tap px-4 py-2 rounded-full font-bold text-sm bg-rak-50 border-2 border-rak-300 text-rak-700" data-i18n="tabRak">🎉 락 (즐거움)</button>
       </section>
 
       <!-- 정렬 탭 -->
@@ -133,19 +128,19 @@
 
       <!-- 피드 -->
       <section id="feed" class="space-y-4">
-        <div class="text-center py-12 text-slate-400">로딩 중...</div>
+        <div class="text-center py-12 text-slate-400" data-i18n="loading">로딩 중...</div>
       </section>
 
       <!-- 더 보기 -->
       <div class="mt-6 text-center">
-        <button id="loadMoreBtn" class="tap px-6 py-3 rounded-2xl glass font-bold text-slate-600 hover:bg-white/90 hidden">
+        <button id="loadMoreBtn" class="tap px-6 py-3 rounded-2xl glass font-bold text-slate-600 hover:bg-white/90 hidden" data-i18n="loadMore">
           더 보기 ↓
         </button>
       </div>
 
       <footer class="mt-12 pb-8 text-center text-xs text-slate-400">
-        <p>© FunnyFunny · 희노애락 익명 썰 플랫폼</p>
-        <a href="https://funnyfunny.cloud/" target="_blank" class="inline-block mt-2 px-4 py-2 rounded-xl bg-white/80 border border-slate-200 font-semibold text-slate-500 hover:bg-white">다른 서비스 보기</a>
+        <p data-i18n="footer">© FunnyFunny · 희노애락 익명 썰 플랫폼</p>
+        <a href="https://funnyfunny.cloud/" target="_blank" class="inline-block mt-2 px-4 py-2 rounded-xl bg-white/80 border border-slate-200 font-semibold text-slate-500 hover:bg-white" data-i18n="moreServicesFooter">다른 서비스 보기</a>
       </footer>
     </main>
 
@@ -156,16 +151,16 @@
         <div class="glass w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden card-enter">
           <div class="p-4 border-b border-slate-200 flex items-center justify-between">
             <div>
-              <h3 class="text-lg font-black">✍️ 감정 썰 쓰기</h3>
-              <p class="text-xs text-slate-500">감정을 선택하고 툭 털어놓으세요</p>
+              <h3 class="text-lg font-black" data-i18n="composeTitle">✍️ 감정 썰 쓰기</h3>
+              <p class="text-xs text-slate-500" data-i18n="composeSubtitle">감정을 선택하고 툭 털어놓으세요</p>
             </div>
-            <button id="closeWriteBtn" class="tap px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200">닫기</button>
+            <button id="closeWriteBtn" class="tap px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200" data-i18n="close">닫기</button>
           </div>
 
           <div class="p-4 space-y-4">
             <!-- 감정 선택 -->
             <div>
-              <label class="text-sm font-semibold text-slate-600 mb-2 block">감정 선택</label>
+              <label class="text-sm font-semibold text-slate-600 mb-2 block" data-i18n="selectEmotion">감정 선택</label>
               <div class="flex flex-wrap gap-2">
                 <button type="button" data-write-emotion="hui" class="writeEmotionBtn tap px-4 py-2 rounded-full font-bold text-sm bg-hui-100 border-2 border-hui-300 text-hui-700 hover:bg-hui-200">😊 희</button>
                 <button type="button" data-write-emotion="no" class="writeEmotionBtn tap px-4 py-2 rounded-full font-bold text-sm bg-no-100 border-2 border-no-300 text-no-700 hover:bg-no-200">😤 노</button>
@@ -176,28 +171,28 @@
 
             <!-- 템플릿 힌트 -->
             <div id="templateHint" class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-sm text-slate-600 hidden">
-              <p class="font-semibold mb-1">💡 이렇게 써보세요</p>
+              <p class="font-semibold mb-1" data-i18n="templateHint">💡 이렇게 써보세요</p>
               <p id="templateText"></p>
             </div>
 
             <!-- 닉네임 -->
             <div>
-              <label class="text-sm font-semibold text-slate-600 mb-1 block">닉네임 (선택)</label>
-              <input id="writeNickname" type="text" maxlength="20" placeholder="익명" class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100" />
+              <label class="text-sm font-semibold text-slate-600 mb-1 block" data-i18n="nickname">닉네임 (선택)</label>
+              <input id="writeNickname" type="text" maxlength="20" placeholder="익명" data-i18n-placeholder="anonymous" class="w-full px-4 py-2.5 rounded-xl bg-white border border-slate-200 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100" />
             </div>
 
             <!-- 본문 -->
             <div>
-              <label class="text-sm font-semibold text-slate-600 mb-1 block">본문</label>
-              <textarea id="writeBody" rows="5" maxlength="5000" placeholder="오늘 있었던 일을 툭 털어놓으세요..." class="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 resize-none"></textarea>
+              <label class="text-sm font-semibold text-slate-600 mb-1 block" data-i18n="body">본문</label>
+              <textarea id="writeBody" rows="5" maxlength="5000" data-i18n-placeholder="bodyPlaceholder" placeholder="오늘 있었던 일을 툭 털어놓으세요..." class="w-full px-4 py-3 rounded-xl bg-white border border-slate-200 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 resize-none"></textarea>
               <div class="mt-1 flex justify-between text-xs text-slate-400">
-                <span>쿨타임: 30초</span>
+                <span data-i18n="cooldown">쿨타임: 30초</span>
                 <span id="writeCount">0/5000</span>
               </div>
             </div>
 
             <div class="flex justify-end gap-2">
-              <button id="submitWriteBtn" class="tap px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-pink-400 text-white font-bold shadow-lg hover:shadow-xl">
+              <button id="submitWriteBtn" class="tap px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-pink-400 text-white font-bold shadow-lg hover:shadow-xl" data-i18n="submit">
                 게시하기
               </button>
             </div>
@@ -220,6 +215,160 @@
 
     <script>
       // ============================
+      // i18n
+      // ============================
+      const LS_LANG = 'emote_lang';
+      const I18N = {
+        ko: {
+          heroTitle: '오늘, 어떤 <span class="bg-gradient-to-r from-amber-500 via-pink-500 to-emerald-500 bg-clip-text text-transparent">감정</span>이세요?',
+          heroSubtitle: '익명으로 감정을 털어놓고 공감받는 썰 플랫폼',
+          moreServices: '다른 서비스 ↗',
+          moreServicesFooter: '다른 서비스 보기',
+          writeBtn: '✍️ 썰 쓰기',
+          dailyQuestion: '💡 오늘의 질문',
+          answerQuestion: '이 질문에 답하기 →',
+          tabAll: '🌈 전체',
+          tabHui: '😊 희 (기쁨)',
+          tabNo: '😤 노 (분노)',
+          tabAe: '💕 애 (사랑)',
+          tabRak: '🎉 락 (즐거움)',
+          loading: '로딩 중...',
+          loadMore: '더 보기 ↓',
+          footer: '© FunnyFunny · 희노애락 익명 썰 플랫폼',
+          composeTitle: '✍️ 감정 썰 쓰기',
+          composeSubtitle: '감정을 선택하고 툭 털어놓으세요',
+          close: '닫기',
+          selectEmotion: '감정 선택',
+          templateHint: '💡 이렇게 써보세요',
+          nickname: '닉네임 (선택)',
+          anonymous: '익명',
+          body: '본문',
+          bodyPlaceholder: '오늘 있었던 일을 툭 털어놓으세요...',
+          cooldown: '쿨타임: 30초',
+          submit: '게시하기',
+          emptyFeed: '아직 썰이 없어요',
+          emptyFeedSub: '첫 번째로 감정을 털어놓아 보세요!',
+          writeCta: '썰 쓰기 →',
+          anonymousLabel: '익명',
+          comments: '댓글',
+          empathize: '공감',
+          commentPlaceholder: '공감의 한마디...',
+          postComment: '등록',
+          noComments: '아직 댓글이 없어요',
+          timeAgo: { just: '방금', min: '분 전', hour: '시간 전', day: '일 전' },
+          alert: { selectEmotion: '감정을 선택해주세요', enterBody: '내용을 입력해주세요', cooldown: '잠시 후 다시 시도해주세요', alreadyEmpathy: '이미 공감했어요!', empathyDone: '공감했어요 ❤️', empathyFail: '공감 실패', enterComment: '댓글을 입력해주세요', commentFail: '댓글 등록 실패', postSuccess: '썰이 등록됐어요! 🎉', loadFail: '로딩 실패' }
+        },
+        en: {
+          heroTitle: 'How are you <span class="bg-gradient-to-r from-amber-500 via-pink-500 to-emerald-500 bg-clip-text text-transparent">feeling</span> today?',
+          heroSubtitle: 'Anonymous emotion story platform. Share and get empathy.',
+          moreServices: 'More services ↗',
+          moreServicesFooter: 'View more services',
+          writeBtn: '✍️ Write',
+          dailyQuestion: '💡 Today\'s question',
+          answerQuestion: 'Answer this question →',
+          tabAll: '🌈 All',
+          tabHui: '😊 Joy',
+          tabNo: '😤 Anger',
+          tabAe: '💕 Love',
+          tabRak: '🎉 Fun',
+          loading: 'Loading...',
+          loadMore: 'Load more ↓',
+          footer: '© FunnyFunny · Emote anonymous story platform',
+          composeTitle: '✍️ Write your story',
+          composeSubtitle: 'Pick an emotion and share',
+          close: 'Close',
+          selectEmotion: 'Select emotion',
+          templateHint: '💡 Try writing like this',
+          nickname: 'Nickname (optional)',
+          anonymous: 'Anonymous',
+          body: 'Body',
+          bodyPlaceholder: 'Share what happened today...',
+          cooldown: 'Cooldown: 30s',
+          submit: 'Post',
+          emptyFeed: 'No stories yet',
+          emptyFeedSub: 'Be the first to share your feelings!',
+          writeCta: 'Write →',
+          anonymousLabel: 'Anonymous',
+          comments: 'Comments',
+          empathize: 'Empathy',
+          commentPlaceholder: 'Leave a comment...',
+          postComment: 'Post',
+          noComments: 'No comments yet',
+          timeAgo: { just: 'Just now', min: 'm ago', hour: 'h ago', day: 'd ago' },
+          alert: { selectEmotion: 'Please select an emotion', enterBody: 'Please enter content', cooldown: 'Please try again later', alreadyEmpathy: 'Already empathized!', empathyDone: 'Empathized ❤️', empathyFail: 'Empathy failed', enterComment: 'Please enter a comment', commentFail: 'Comment failed', postSuccess: 'Posted! 🎉', loadFail: 'Load failed' }
+        }
+      };
+
+      const EMOTION_LABELS = {
+        ko: { hui: '희', no: '노', ae: '애', rak: '락' },
+        en: { hui: 'Joy', no: 'Anger', ae: 'Love', rak: 'Fun' }
+      };
+
+      const DAILY_QUESTIONS = {
+        ko: [
+          { emotion: 'hui', q: '오늘 괜히 웃음 나온 순간이 있나요?' },
+          { emotion: 'no', q: '오늘 제일 어이없었던 말 한마디는?' },
+          { emotion: 'ae', q: '지금 떠오르는 한 사람이 있다면?' },
+          { emotion: 'rak', q: '오늘 가장 재밌었던 장면은?' },
+          { emotion: 'hui', q: '작은 거지만 기뻤던 순간을 공유해주세요!' },
+          { emotion: 'no', q: '참다 참다 터진 순간이 있었나요?' },
+          { emotion: 'ae', q: '요즘 마음에 담아둔 사람이 있나요?' },
+          { emotion: 'rak', q: '최근 빵 터진 에피소드를 들려주세요!' }
+        ],
+        en: [
+          { emotion: 'hui', q: 'Any moment that made you smile today?' },
+          { emotion: 'no', q: 'What was the most frustrating thing someone said today?' },
+          { emotion: 'ae', q: 'Is there someone on your mind right now?' },
+          { emotion: 'rak', q: 'What was the funniest moment today?' },
+          { emotion: 'hui', q: 'Share a small joy from today!' },
+          { emotion: 'no', q: 'Did something finally push you over the edge?' },
+          { emotion: 'ae', q: 'Anyone you\'ve been thinking about lately?' },
+          { emotion: 'rak', q: 'Share a recent funny story!' }
+        ]
+      };
+
+      const TEMPLATES = {
+        ko: {
+          hui: '오늘 제일 기뻤던 순간 → 누가 봐도 공감될 포인트 → 한 줄 결론',
+          no: '상황(팩트) → 내 감정 → 바라는 것(위로 or 해결)',
+          ae: '상대에게 말 못한 한 문장 → 고마웠던 장면 → 지금 느낌',
+          rak: '웃긴 포인트 하나 → 반전 있으면 더 좋아요 → 결말'
+        },
+        en: {
+          hui: 'Best moment today → Relatable point → One-line conclusion',
+          no: 'Situation (facts) → How you felt → What you want (support or solution)',
+          ae: 'Something you couldn\'t say → A grateful moment → How you feel now',
+          rak: 'One funny point → Plot twist if any → Ending'
+        }
+      };
+
+      function getLang() {
+        return localStorage.getItem(LS_LANG) || (navigator.language?.startsWith('ko') ? 'ko' : 'en');
+      }
+
+      const PAGE_TITLES = { ko: '희노애락 — 감정 썰 플랫폼', en: 'Emote — Anonymous Emotion Stories' };
+
+      function setLang(lang) {
+        localStorage.setItem(LS_LANG, lang);
+        document.documentElement.lang = lang === 'ko' ? 'ko' : 'en';
+        document.title = PAGE_TITLES[lang] || PAGE_TITLES.en;
+        const t = I18N[lang] || I18N.en;
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+          const key = el.dataset.i18n;
+          if (key === 'heroTitle') el.innerHTML = t.heroTitle;
+          else if (t[key]) el.textContent = t[key];
+        });
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+          const key = el.dataset.i18nPlaceholder;
+          if (t[key]) el.placeholder = t[key];
+        });
+        document.querySelectorAll('.langBtn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.lang === lang);
+        });
+        if (typeof applyLang === 'function') applyLang(lang);
+      }
+
+      // ============================
       // Supabase 연결 (flow와 동일)
       // ============================
       const SUPABASE_URL = "https://vpezjsuzwmeozaytcqyv.supabase.co";
@@ -230,29 +379,15 @@
       // 감정 설정
       // ============================
       const EMOTIONS = {
-        hui: { emoji: '😊', label: '희', color: 'hui', desc: '기쁨', slug: 'hui-joy' },
-        no: { emoji: '😤', label: '노', color: 'no', desc: '분노', slug: 'no-anger' },
-        ae: { emoji: '💕', label: '애', color: 'ae', desc: '사랑', slug: 'ae-love' },
-        rak: { emoji: '🎉', label: '락', color: 'rak', desc: '즐거움', slug: 'rak-joy' }
+        hui: { emoji: '😊', color: 'hui', desc: '기쁨', slug: 'hui-joy' },
+        no: { emoji: '😤', color: 'no', desc: '분노', slug: 'no-anger' },
+        ae: { emoji: '💕', color: 'ae', desc: '사랑', slug: 'ae-love' },
+        rak: { emoji: '🎉', color: 'rak', desc: '즐거움', slug: 'rak-joy' }
       };
 
-      const TEMPLATES = {
-        hui: '오늘 제일 기뻤던 순간 → 누가 봐도 공감될 포인트 → 한 줄 결론',
-        no: '상황(팩트) → 내 감정 → 바라는 것(위로 or 해결)',
-        ae: '상대에게 말 못한 한 문장 → 고마웠던 장면 → 지금 느낌',
-        rak: '웃긴 포인트 하나 → 반전 있으면 더 좋아요 → 결말'
-      };
-
-      const DAILY_QUESTIONS = [
-        { emotion: 'hui', q: '오늘 괜히 웃음 나온 순간이 있나요?' },
-        { emotion: 'no', q: '오늘 제일 어이없었던 말 한마디는?' },
-        { emotion: 'ae', q: '지금 떠오르는 한 사람이 있다면?' },
-        { emotion: 'rak', q: '오늘 가장 재밌었던 장면은?' },
-        { emotion: 'hui', q: '작은 거지만 기뻤던 순간을 공유해주세요!' },
-        { emotion: 'no', q: '참다 참다 터진 순간이 있었나요?' },
-        { emotion: 'ae', q: '요즘 마음에 담아둔 사람이 있나요?' },
-        { emotion: 'rak', q: '최근 빵 터진 에피소드를 들려주세요!' }
-      ];
+      function getEmotionLabel(emotion) {
+        return EMOTION_LABELS[getLang()]?.[emotion] || EMOTION_LABELS.ko[emotion];
+      }
 
       // ============================
       // 상태
@@ -276,11 +411,12 @@
       function timeAgo(iso) {
         const diff = Math.max(0, Date.now() - new Date(iso).getTime());
         const m = Math.floor(diff / 60000);
-        if (m < 1) return '방금';
-        if (m < 60) return `${m}분 전`;
+        const ta = I18N[getLang()]?.timeAgo || I18N.en.timeAgo;
+        if (m < 1) return ta.just;
+        if (m < 60) return `${m}${ta.min}`;
         const h = Math.floor(m / 60);
-        if (h < 24) return `${h}시간 전`;
-        return `${Math.floor(h / 24)}일 전`;
+        if (h < 24) return `${h}${ta.hour}`;
+        return `${Math.floor(h / 24)}${ta.day}`;
       }
 
       function getAnonId() {
@@ -338,15 +474,29 @@
       // 오늘의 질문
       // ============================
       function setDailyQuestion() {
-        const dayIdx = new Date().getDate() % DAILY_QUESTIONS.length;
-        const q = DAILY_QUESTIONS[dayIdx];
+        const questions = DAILY_QUESTIONS[getLang()] || DAILY_QUESTIONS.en;
+        const dayIdx = new Date().getDate() % questions.length;
+        const q = questions[dayIdx];
         $('#questionText').textContent = q.q;
         $('#answerQuestionBtn').dataset.emotion = q.emotion;
       }
 
       $('#answerQuestionBtn').addEventListener('click', () => {
         const emotion = $('#answerQuestionBtn').dataset.emotion;
-        openWriteModal(emotion, DAILY_QUESTIONS.find(q => q.emotion === emotion)?.q);
+        const questions = DAILY_QUESTIONS[getLang()] || DAILY_QUESTIONS.en;
+        openWriteModal(emotion, questions.find(q => q.emotion === emotion)?.q);
+      });
+
+      function applyLang(lang) {
+        setDailyQuestion();
+        loadEmotionRatio();
+        renderFeed();
+      }
+
+      document.querySelectorAll('.langBtn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          setLang(btn.dataset.lang);
+        });
       });
 
       // ============================
@@ -362,12 +512,13 @@
             if (counts[e] !== undefined) counts[e]++;
           });
           const total = Object.values(counts).reduce((a, b) => a + b, 0) || 1;
+          const labels = EMOTION_LABELS[getLang()] || EMOTION_LABELS.ko;
           const ratio = $('#emotionRatio');
           ratio.innerHTML = `
-            <span class="px-2 py-1 rounded-full bg-hui-100 text-hui-600">희 ${Math.round(counts.hui / total * 100)}%</span>
-            <span class="px-2 py-1 rounded-full bg-no-100 text-no-600">노 ${Math.round(counts.no / total * 100)}%</span>
-            <span class="px-2 py-1 rounded-full bg-ae-100 text-ae-600">애 ${Math.round(counts.ae / total * 100)}%</span>
-            <span class="px-2 py-1 rounded-full bg-rak-100 text-rak-600">락 ${Math.round(counts.rak / total * 100)}%</span>
+            <span class="px-2 py-1 rounded-full bg-hui-100 text-hui-600">${labels.hui} ${Math.round(counts.hui / total * 100)}%</span>
+            <span class="px-2 py-1 rounded-full bg-no-100 text-no-600">${labels.no} ${Math.round(counts.no / total * 100)}%</span>
+            <span class="px-2 py-1 rounded-full bg-ae-100 text-ae-600">${labels.ae} ${Math.round(counts.ae / total * 100)}%</span>
+            <span class="px-2 py-1 rounded-full bg-rak-100 text-rak-600">${labels.rak} ${Math.round(counts.rak / total * 100)}%</span>
           `;
         } catch (e) { console.error(e); }
       }
@@ -378,7 +529,8 @@
       async function loadFeed(append = false) {
         if (!append) {
           offset = 0;
-          $('#feed').innerHTML = '<div class="text-center py-12 text-slate-400">로딩 중...</div>';
+          const loading = I18N[getLang()]?.loading || 'Loading...';
+          $('#feed').innerHTML = `<div class="text-center py-12 text-slate-400">${loading}</div>`;
         }
 
         try {
@@ -420,19 +572,22 @@
           $('#loadMoreBtn').classList.toggle('hidden', (data?.length || 0) < LIMIT);
         } catch (e) {
           console.error(e);
-          $('#feed').innerHTML = '<div class="text-center py-12 text-red-400">로딩 실패</div>';
+          const msg = I18N[getLang()]?.alert?.loadFail || 'Load failed';
+          $('#feed').innerHTML = `<div class="text-center py-12 text-red-400">${msg}</div>`;
         }
       }
 
       function renderFeed() {
+        const t = I18N[getLang()] || I18N.en;
+        const anonLabel = t.anonymousLabel || 'Anonymous';
         if (posts.length === 0) {
           $('#feed').innerHTML = `
             <div class="glass rounded-2xl p-8 text-center">
               <p class="text-4xl mb-3">📝</p>
-              <p class="font-bold text-slate-600">아직 썰이 없어요</p>
-              <p class="text-sm text-slate-400 mt-1">첫 번째로 감정을 털어놓아 보세요!</p>
+              <p class="font-bold text-slate-600">${t.emptyFeed}</p>
+              <p class="text-sm text-slate-400 mt-1">${t.emptyFeedSub}</p>
               <button onclick="openWriteModal()" class="tap mt-4 px-5 py-2 rounded-xl bg-gradient-to-r from-amber-400 to-pink-400 text-white font-bold">
-                썰 쓰기 →
+                ${t.writeCta}
               </button>
             </div>
           `;
@@ -442,6 +597,7 @@
         $('#feed').innerHTML = posts.map((p, i) => {
           const emotion = detectEmotion(p);
           const em = EMOTIONS[emotion];
+          const label = getEmotionLabel(emotion);
           const isHot = p.empathy_count >= 3;
           const summary = extractSummary(p.body);
           const preview = p.body.slice(0, 120) + (p.body.length > 120 ? '...' : '');
@@ -454,9 +610,9 @@
                 </div>
                 <div class="flex-1 min-w-0">
                   <div class="flex items-center gap-2 flex-wrap">
-                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-${em.color}-100 text-${em.color}-700">${em.emoji} ${em.label}</span>
+                    <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-${em.color}-100 text-${em.color}-700">${em.emoji} ${label}</span>
                     ${isHot ? '<span class="px-2 py-0.5 rounded-full text-xs font-bold text-white hot-badge">🔥 HOT</span>' : ''}
-                    <span class="text-xs text-slate-400">${esc(p.author_name || '익명')} · ${timeAgo(p.created_at)}</span>
+                    <span class="text-xs text-slate-400">${esc(p.author_name || anonLabel)} · ${timeAgo(p.created_at)}</span>
                   </div>
                   ${summary ? `<p class="mt-1 font-bold text-slate-800">${esc(summary)}</p>` : ''}
                   <p class="mt-1 text-sm text-slate-600 line-clamp-2">${esc(preview)}</p>
@@ -492,8 +648,10 @@
         const post = posts.find(p => p.id === postId);
         if (!post) return;
 
+        const t = I18N[getLang()] || I18N.en;
         const emotion = detectEmotion(post);
         const em = EMOTIONS[emotion];
+        const label = getEmotionLabel(emotion);
 
         // 댓글 로드
         const { data: comments } = await sb.from('comments')
@@ -501,10 +659,11 @@
           .eq('post_id', postId)
           .order('created_at', { ascending: true });
 
+        const anonLabel = t.anonymousLabel || 'Anonymous';
         const commentsHtml = (comments || []).map(c => `
           <div class="p-3 rounded-xl bg-slate-50 border border-slate-100">
             <div class="flex items-center gap-2 text-xs text-slate-500 mb-1">
-              <span class="font-semibold text-slate-700">${esc(c.author_name || '익명')}</span>
+              <span class="font-semibold text-slate-700">${esc(c.author_name || anonLabel)}</span>
               <span>·</span>
               <span>${timeAgo(c.created_at)}</span>
             </div>
@@ -515,28 +674,28 @@
         $('#detailContent').innerHTML = `
           <div class="p-4 border-b border-slate-200 flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <span class="px-2 py-1 rounded-full text-sm font-bold bg-${em.color}-100 text-${em.color}-700">${em.emoji} ${em.label}</span>
-              <span class="text-sm text-slate-500">${esc(post.author_name || '익명')} · ${timeAgo(post.created_at)}</span>
+              <span class="px-2 py-1 rounded-full text-sm font-bold bg-${em.color}-100 text-${em.color}-700">${em.emoji} ${label}</span>
+              <span class="text-sm text-slate-500">${esc(post.author_name || t.anonymousLabel)} · ${timeAgo(post.created_at)}</span>
             </div>
-            <button onclick="closeDetail()" class="tap px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200">닫기</button>
+            <button onclick="closeDetail()" class="tap px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 font-semibold hover:bg-slate-200">${t.close}</button>
           </div>
           <div class="p-4">
             <p class="text-slate-800 whitespace-pre-wrap leading-relaxed">${esc(post.body)}</p>
             <div class="mt-4 flex items-center gap-4">
               <button onclick="empathize('${postId}')" class="tap flex items-center gap-2 px-4 py-2 rounded-xl bg-pink-50 text-pink-600 font-semibold border border-pink-200 hover:bg-pink-100">
-                ❤️ 공감 ${post.empathy_count || 0}
+                ❤️ ${t.empathize} ${post.empathy_count || 0}
               </button>
-              <span class="text-sm text-slate-500">💬 댓글 ${post.comment_count || 0}</span>
+              <span class="text-sm text-slate-500">💬 ${t.comments} ${post.comment_count || 0}</span>
             </div>
           </div>
           <div class="p-4 border-t border-slate-200">
-            <h4 class="font-bold text-slate-700 mb-3">💬 댓글</h4>
+            <h4 class="font-bold text-slate-700 mb-3">💬 ${t.comments}</h4>
             <div class="space-y-2 mb-4 max-h-60 overflow-y-auto">
-              ${commentsHtml || '<p class="text-sm text-slate-400">아직 댓글이 없어요</p>'}
+              ${commentsHtml || `<p class="text-sm text-slate-400">${t.noComments}</p>`}
             </div>
             <div class="flex gap-2">
-              <input id="commentInput" type="text" maxlength="500" placeholder="공감의 한마디..." class="flex-1 px-3 py-2 rounded-xl bg-white border border-slate-200 outline-none focus:border-amber-400" />
-              <button onclick="submitComment('${postId}')" class="tap px-4 py-2 rounded-xl bg-amber-400 text-white font-bold">등록</button>
+              <input id="commentInput" type="text" maxlength="500" placeholder="${t.commentPlaceholder}" class="flex-1 px-3 py-2 rounded-xl bg-white border border-slate-200 outline-none focus:border-amber-400" />
+              <button onclick="submitComment('${postId}')" class="tap px-4 py-2 rounded-xl bg-amber-400 text-white font-bold">${t.postComment}</button>
             </div>
           </div>
         `;
@@ -558,33 +717,36 @@
       // 공감 / 댓글
       // ============================
       async function empathize(postId) {
+        const t = I18N[getLang()]?.alert || I18N.en.alert;
         const key = `emote_emp_${postId}`;
         if (localStorage.getItem(key)) {
-          alert('이미 공감했어요!');
+          alert(t.alreadyEmpathy);
           return;
         }
         try {
           await sb.rpc('increment_empathy', { row_id: postId });
           localStorage.setItem(key, '1');
-          alert('공감했어요 ❤️');
+          alert(t.empathyDone);
           loadFeed();
           closeDetail();
         } catch (e) {
           console.error(e);
-          alert('공감 실패');
+          alert(t.empathyFail);
         }
       }
 
       async function submitComment(postId) {
+        const t = I18N[getLang()]?.alert || I18N.en.alert;
         const body = $('#commentInput').value.trim();
-        if (!body) return alert('댓글을 입력해주세요');
-        if (inCooldown()) return alert('잠시 후 다시 시도해주세요');
+        if (!body) return alert(t.enterComment);
+        if (inCooldown()) return alert(t.cooldown);
 
         try {
+          const anonLabel = I18N[getLang()]?.anonymousLabel || 'Anonymous';
           const { error } = await sb.from('comments').insert({
             post_id: postId,
             body,
-            author_name: '익명',
+            author_name: anonLabel,
             anon_id: anonId
           });
           if (error) throw error;
@@ -592,7 +754,7 @@
           openDetail(postId);
         } catch (e) {
           console.error(e);
-          alert('댓글 등록 실패');
+          alert(t.commentFail);
         }
       }
 
@@ -601,9 +763,15 @@
       // ============================
       let selectedEmotion = '';
 
+      const PREFILL_PREFIX = { ko: '[오늘의 질문: ', en: "[Today's question: " };
+      const PREFILL_SUFFIX = { ko: ']\n\n', en: ']\n\n' };
+
       function openWriteModal(emotion = '', prefill = '') {
         $('#writeModal').classList.remove('hidden');
-        $('#writeBody').value = prefill ? `[오늘의 질문: ${prefill}]\n\n` : '';
+        const lang = getLang();
+        const prefix = PREFILL_PREFIX[lang] || PREFILL_PREFIX.en;
+        const suffix = PREFILL_SUFFIX[lang] || PREFILL_SUFFIX.en;
+        $('#writeBody').value = prefill ? `${prefix}${prefill}${suffix}` : '';
         $('#writeCount').textContent = `${$('#writeBody').value.length}/5000`;
         if (emotion) selectWriteEmotion(emotion);
       }
@@ -637,7 +805,8 @@
           b.classList.toggle('ring-offset-2', isActive);
         });
         $('#templateHint').classList.remove('hidden');
-        $('#templateText').textContent = TEMPLATES[emotion];
+        const templates = TEMPLATES[getLang()] || TEMPLATES.en;
+        $('#templateText').textContent = templates[emotion];
       }
 
       $$('.writeEmotionBtn').forEach(btn => {
@@ -656,12 +825,14 @@
       });
 
       $('#submitWriteBtn').addEventListener('click', async () => {
-        if (!selectedEmotion) return alert('감정을 선택해주세요');
+        const t = I18N[getLang()]?.alert || I18N.en.alert;
+        const anonLabel = I18N[getLang()]?.anonymousLabel || 'Anonymous';
+        if (!selectedEmotion) return alert(t.selectEmotion);
         const body = $('#writeBody').value.trim();
-        if (!body) return alert('내용을 입력해주세요');
-        if (inCooldown()) return alert('잠시 후 다시 시도해주세요');
+        if (!body) return alert(t.enterBody);
+        if (inCooldown()) return alert(t.cooldown);
 
-        const nickname = $('#writeNickname').value.trim() || '익명';
+        const nickname = $('#writeNickname').value.trim() || anonLabel;
 
         try {
           // 해당 감정의 board 찾기 또는 생성
@@ -691,10 +862,11 @@
           closeWriteModal();
           loadFeed();
           loadEmotionRatio();
-          alert('썰이 등록됐어요! 🎉');
+          alert(t.postSuccess);
         } catch (e) {
           console.error(e);
-          $('#writeError').textContent = '등록 실패: ' + (e.message || '알 수 없는 오류');
+          const errMsg = getLang() === 'ko' ? '등록 실패: ' : 'Post failed: ';
+          $('#writeError').textContent = errMsg + (e.message || '');
           $('#writeError').classList.remove('hidden');
         }
       });
@@ -729,8 +901,7 @@
       // ============================
       // 초기화
       // ============================
-      setDailyQuestion();
-      loadEmotionRatio();
+      setLang(getLang());
       loadFeed();
     </script>
   </body>
